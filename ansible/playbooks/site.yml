@@ -1,0 +1,11 @@
+- hosts: bastion
+  roles:
+    - bastion
+
+- hosts: postgres
+  roles:
+    - postgres
+
+- hosts: monitoring
+  roles:
+    - monitoring

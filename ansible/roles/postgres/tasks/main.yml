@@ -1,0 +1,22 @@
+- name: Installer PostgreSQL
+  ansible.builtin.apt:
+    name: postgresql
+    state: present
+    update_cache: yes
+
+- name: Démarrer PostgreSQL
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Créer l'utilisateur PostgreSQL
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_user }}"
+    password: "{{ postgres_password }}"
+    role_attr_flags: SUPERUSER
+
+- name: Créer la base de données
+  community.postgresql.postgresql_db:
+    name: "{{ postgres_db }}"
+    owner: "{{ postgres_user }}"

@@ -1,0 +1,23 @@
+- name: Installer Docker (pour Prometheus/Grafana)
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose
+    state: present
+    update_cache: yes
+
+- name: Créer dossier monitoring
+  ansible.builtin.file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'
+
+- name: Copier docker-compose.yml
+  ansible.builtin.copy:
+    src: files/monitoring-docker-compose.yml
+    dest: /opt/monitoring/docker-compose.yml
+
+- name: Lancer Prometheus et Grafana
+  ansible.builtin.command:
+    cmd: docker-compose up -d
+    chdir: /opt/monitoring
