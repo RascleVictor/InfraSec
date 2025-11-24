@@ -13,3 +13,12 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./localstack:/var/lib/localstack"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Password123!
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
