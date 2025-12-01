@@ -19,6 +19,6 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: Password123!
-      POSTGRES_DB: appdb
+      POSTGRES_DB: infra_secure
     ports:
       - "5432:5432"

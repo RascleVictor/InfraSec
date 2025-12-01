@@ -1,4 +1,3 @@
-# --- VPC ---
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -11,7 +10,6 @@ resource "aws_vpc" "main" {
 
 data "aws_availability_zones" "available" {}
 
-# --- Subnets publics ---
 resource "aws_subnet" "public" {
   for_each = toset(var.public_subnets)
 
@@ -25,7 +23,6 @@ resource "aws_subnet" "public" {
   }
 }
 
-# --- Subnets privés ---
 resource "aws_subnet" "private" {
   for_each = toset(var.private_subnets)
 
@@ -39,7 +36,6 @@ resource "aws_subnet" "private" {
   }
 }
 
-# --- Internet Gateway ---
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
@@ -48,7 +44,6 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# --- Public Route Table ---
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -69,7 +64,6 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# --- Security Group Bastion ---
 resource "aws_security_group" "bastion_sg" {
   name   = "${var.project_name}-bastion-sg"
   vpc_id = aws_vpc.main.id
@@ -93,7 +87,6 @@ resource "aws_security_group" "bastion_sg" {
   }
 }
 
-# --- Bastion simulé ---
 resource "null_resource" "bastion" {
   triggers = {
     instance_id = "i-bastion-local"
@@ -102,7 +95,6 @@ resource "null_resource" "bastion" {
   }
 }
 
-# --- SG pour RDS simulé ---
 resource "aws_security_group" "rds_sg" {
   name   = "${var.project_name}-rds-sg"
   vpc_id = aws_vpc.main.id
@@ -126,7 +118,6 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
-# --- Simulation RDS (aucun appel AWS) ---
 resource "null_resource" "rds" {
   triggers = {
     endpoint = "postgres.local:5432"
@@ -134,7 +125,6 @@ resource "null_resource" "rds" {
   }
 }
 
-# --- OUTPUTS ---
 output "vpc_id" {
   value = aws_vpc.main.id
 }
