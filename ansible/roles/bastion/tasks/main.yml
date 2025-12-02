@@ -1,6 +1,7 @@
 - name: Mettre à jour le cache APT
   ansible.builtin.apt:
     update_cache: yes
+  become: yes
 
 - name: Installer les packages de base
   ansible.builtin.apt:

@@ -1,0 +1,10 @@
+services:
+  bastion:
+    image: python:3.12
+    container_name: bastion-ansible
+    volumes:
+      - ../ansible:/ansible       # on monte ton ansible existant
+      - ~/.ssh:/root/.ssh:ro      # si tu utilises des clés SSH
+    working_dir: /ansible
+    tty: true
+    command: bash

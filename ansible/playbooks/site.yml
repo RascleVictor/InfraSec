@@ -1,11 +1,14 @@
 - hosts: bastion
   roles:
     - bastion
+  become: yes
 
 - hosts: postgres
   roles:
     - postgres
+  become: yes
 
 - hosts: monitoring
   roles:
     - monitoring
+  become: yes

@@ -1,23 +1,85 @@
-- name: Installer Docker (pour Prometheus/Grafana)
+- name: Installer les dépendances pour Docker
   ansible.builtin.apt:
     name:
-      - docker.io
-      - docker-compose
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
     state: present
     update_cache: yes
+  become: yes
+
+- name: Ajouter la clé GPG officielle de Docker
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  become: yes
+
+- name: Ajouter le dépôt Docker
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+    state: present
+  become: yes
+
+- name: Installer Docker et docker-compose
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  become: yes
 
 - name: Créer dossier monitoring
   ansible.builtin.file:
     path: /opt/monitoring
     state: directory
     mode: '0755'
+    owner: victor
+    group: victor
+  become: yes
+
+- name: Vérifier que le dossier existe
+  ansible.builtin.command: ls -la /opt/
+  become: yes
+  register: opt_contents
+
+- name: Afficher le contenu de /opt
+  ansible.builtin.debug:
+    var: opt_contents.stdout_lines
+
+- name: Vérifier les droits du dossier monitoring
+  ansible.builtin.stat:
+    path: /opt/monitoring
+  become: yes
+  register: monitoring_stat
+
+- name: Afficher les infos du dossier
+  ansible.builtin.debug:
+    var: monitoring_stat
 
 - name: Copier docker-compose.yml
   ansible.builtin.copy:
-    src: files/monitoring-docker-compose.yml
+    src: /root/IdeaProjects/InfraSec/Docker-Compose-Prometheus-and-Grafana/docker-compose.yml
     dest: /opt/monitoring/docker-compose.yml
+    mode: '0644'
+  become: yes
+
+- name: Vérifier que le fichier est bien copié
+  ansible.builtin.command: ls -la /opt/monitoring/
+  become: yes
+  register: monitoring_contents
+
+- name: Afficher le contenu de /opt/monitoring
+  ansible.builtin.debug:
+    var: monitoring_contents.stdout_lines
 
 - name: Lancer Prometheus et Grafana
-  ansible.builtin.command:
-    cmd: docker-compose up -d
-    chdir: /opt/monitoring
+  community.docker.docker_compose_v2:
+    project_src: /opt/monitoring
+    state: present
+  become: yes
+  become_user: victor
